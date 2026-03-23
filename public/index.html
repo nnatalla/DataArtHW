@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ClassicChat</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════ AUTH SCREEN ═══ -->
+<div id="auth-screen" class="auth-screen">
+  <div class="auth-container">
+    <div class="auth-logo">
+      <svg class="auth-logo-icon" viewBox="0 0 40 40" fill="none">
+        <rect width="40" height="40" rx="12" fill="#6366f1"/>
+        <path d="M8 14c0-2.2 1.8-4 4-4h16c2.2 0 4 1.8 4 4v10c0 2.2-1.8 4-4 4H22l-4 4-4-4h-2c-2.2 0-4-1.8-4-4V14z" fill="white"/>
+      </svg>
+      <h1>ClassicChat</h1>
+      <p>Connect with friends and communities</p>
+    </div>
+
+    <div class="auth-tabs">
+      <button class="auth-tab active" data-tab="login">Sign In</button>
+      <button class="auth-tab" data-tab="register">Create Account</button>
+    </div>
+
+    <form id="login-form" class="auth-form">
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" id="login-email" class="input-field" required placeholder="you@example.com" autocomplete="email">
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="login-password" class="input-field" required placeholder="••••••••" autocomplete="current-password">
+      </div>
+      <div class="form-error" id="login-error"></div>
+      <button type="submit" class="btn btn-primary btn-full">Sign In</button>
+    </form>
+
+    <form id="register-form" class="auth-form hidden">
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" id="reg-email" class="input-field" required placeholder="you@example.com" autocomplete="email">
+      </div>
+      <div class="form-group">
+        <label>Username</label>
+        <input type="text" id="reg-username" class="input-field" required placeholder="cooluser_123" minlength="3" maxlength="30" autocomplete="username">
+        <div class="form-hint" id="reg-username-hint"></div>
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="reg-password" class="input-field" required placeholder="••••••••" minlength="8" autocomplete="new-password">
+        <div class="form-hint">At least 8 characters</div>
+      </div>
+      <div class="form-group">
+        <label>Confirm Password</label>
+        <input type="password" id="reg-password-confirm" class="input-field" required placeholder="••••••••" autocomplete="new-password">
+        <div class="form-hint" id="reg-confirm-hint"></div>
+      </div>
+      <div class="form-error" id="register-error"></div>
+      <button type="submit" class="btn btn-primary btn-full">Create Account</button>
+    </form>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════ APP SCREEN ════ -->
+<div id="app-screen" class="app-screen hidden">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <svg class="sidebar-logo-icon" viewBox="0 0 24 24" fill="none">
+        <rect width="24" height="24" rx="7" fill="#6366f1"/>
+        <path d="M4 9c0-1.1.9-2 2-2h12c1.1 0 2 .9 2 2v6c0 1.1-.9 2-2 2h-4l-2 2-2-2H6c-1.1 0-2-.9-2-2V9z" fill="white"/>
+      </svg>
+      <span class="sidebar-title">ClassicChat</span>
+    </div>
+
+    <!-- Rooms section -->
+    <div class="sidebar-section">
+      <div class="sidebar-section-header">
+        <span class="sidebar-section-label">Rooms</span>
+        <button class="section-action-btn" id="btn-browse-rooms" title="Browse & create rooms">
+          <svg viewBox="0 0 16 16" fill="none"><path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+      <div id="rooms-list" class="nav-list"></div>
+    </div>
+
+    <!-- DMs section -->
+    <div class="sidebar-section">
+      <div class="sidebar-section-header">
+        <span class="sidebar-section-label">Direct Messages</span>
+        <button class="section-action-btn" id="btn-add-contact" title="Add a friend">
+          <svg viewBox="0 0 16 16" fill="none"><path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+      <div id="contacts-list" class="nav-list"></div>
+    </div>
+
+    <!-- Friend requests badge area -->
+    <div id="pending-requests-banner" class="pending-requests-banner hidden">
+      <span id="pending-requests-count">0</span> pending friend request(s)
+      <button class="text-btn" id="btn-view-requests">View</button>
+    </div>
+
+    <!-- User panel -->
+    <div class="user-panel">
+      <div class="user-panel-left">
+        <div class="avatar avatar-sm" id="my-avatar"></div>
+        <div class="user-panel-info">
+          <span class="user-panel-name" id="my-username"></span>
+          <span class="user-panel-tag">Online</span>
+        </div>
+      </div>
+      <button class="icon-btn" id="btn-settings" title="Settings">
+        <svg viewBox="0 0 20 20" fill="none"><path d="M10 12.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z" stroke="currentColor" stroke-width="1.5"/><path d="M17 10a7 7 0 1 1-14 0 7 7 0 0 1 14 0z" stroke="currentColor" stroke-width="1.5" stroke-dasharray="2 2"/></svg>
+      </button>
+    </div>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main class="main-content">
+    <!-- Welcome screen -->
+    <div id="welcome-panel" class="welcome-panel">
+      <svg class="welcome-icon" viewBox="0 0 80 80" fill="none">
+        <rect width="80" height="80" rx="24" fill="#6366f1" opacity=".15"/>
+        <path d="M16 28c0-4.4 3.6-8 8-8h32c4.4 0 8 3.6 8 8v20c0 4.4-3.6 8-8 8H44l-4 6-4-6h-4c-4.4 0-8-3.6-8-8V28z" fill="#6366f1" opacity=".3"/>
+        <path d="M28 36h24M28 42h16" stroke="#6366f1" stroke-width="2.5" stroke-linecap="round"/>
+      </svg>
+      <h2>Welcome to ClassicChat</h2>
+      <p>Join a room to chat with a community,<br>or message a friend directly.</p>
+      <div class="welcome-actions">
+        <button class="btn btn-primary" id="btn-welcome-browse">Browse Rooms</button>
+        <button class="btn btn-secondary" id="btn-welcome-friends">Add Friends</button>
+      </div>
+    </div>
+
+    <!-- Chat panel -->
+    <div id="chat-panel" class="chat-panel hidden">
+      <div class="chat-header">
+        <div class="chat-header-left">
+          <div class="chat-header-icon" id="chat-header-icon"></div>
+          <div class="chat-header-meta">
+            <span class="chat-header-name" id="chat-header-name"></span>
+            <span class="chat-header-sub" id="chat-header-sub"></span>
+          </div>
+        </div>
+        <div class="chat-header-right">
+          <button class="icon-btn" id="btn-leave-room" title="Leave room" style="display:none">
+            <svg viewBox="0 0 24 24" fill="none"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><polyline points="9 22 9 12 15 12 15 22" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+          <button class="icon-btn" id="btn-room-settings" title="Room settings">
+            <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          </button>
+          <button class="icon-btn" id="btn-toggle-members" title="Toggle member list">
+            ...
+          </button>
+        </div>
+      </div>
+
+      <!-- Reply preview bar -->
+      <div id="reply-bar" class="reply-bar hidden">
+        <div class="reply-bar-content">
+          <svg viewBox="0 0 16 16" fill="none"><path d="M2 8c0-2.2 1.8-4 4-4h6" stroke="#6366f1" stroke-width="1.5" stroke-linecap="round"/><path d="M8 2l4 4-4 4" stroke="#6366f1" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <span class="reply-bar-text">Replying to <strong id="reply-to-user"></strong>: <span id="reply-to-preview"></span></span>
+        </div>
+        <button class="icon-btn reply-bar-close" id="btn-cancel-reply">✕</button>
+      </div>
+
+      <!-- Messages -->
+      <div class="messages-area" id="messages-area">
+        <button class="load-more-btn" id="load-more-btn">Load older messages</button>
+        <div id="messages-container"></div>
+        <div id="typing-indicator" class="typing-indicator hidden"></div>
+        <div id="scroll-anchor"></div>
+      </div>
+
+      <!-- Message input -->
+      <div class="message-input-area">
+        <div class="upload-preview hidden" id="upload-preview">
+          <div id="upload-preview-inner"></div>
+          <button class="icon-btn upload-cancel-btn" id="btn-cancel-upload">✕</button>
+        </div>
+        <div class="input-row" id="input-row">
+          <button class="icon-btn attach-btn" id="btn-upload" title="Attach file">
+            <svg viewBox="0 0 20 20" fill="none"><path d="M16.5 10.5L9 18a5 5 0 0 1-7-7l8-8a3 3 0 0 1 4.2 4.2L7 14.5a1 1 0 0 1-1.4-1.4L12 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+          <input type="file" id="file-input" style="display:none" accept="image/*,video/*,audio/*,.pdf,.zip,.txt,.doc,.docx,.xls,.xlsx">
+          <div class="message-input-wrap">
+            <textarea id="message-input" placeholder="Send a message…" rows="1" maxlength="3072"></textarea>
+            <button class="emoji-toggle-btn" id="btn-emoji" title="Emoji">
+              <svg viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="7.5" stroke="currentColor" stroke-width="1.5"/><circle cx="7.5" cy="8.5" r="1" fill="currentColor"/><circle cx="12.5" cy="8.5" r="1" fill="currentColor"/><path d="M7 13c.8 1.2 5.2 1.2 6 0" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            </button>
+          </div>
+          <button class="send-btn" id="btn-send" title="Send message">
+            <svg viewBox="0 0 20 20" fill="none"><path d="M3 10L17 3l-4 7 4 7L3 10z" fill="currentColor"/></svg>
+          </button>
+        </div>
+        <div class="emoji-picker hidden" id="emoji-picker"></div>
+      </div>
+    </div>
+  </main>
+
+  <!-- MEMBERS PANEL -->
+  <aside class="members-panel hidden" id="members-panel">
+    <div class="members-panel-header">
+      <span>Members</span>
+      <button class="section-action-btn" id="btn-invite-member" title="Invite user to room">
+        <svg viewBox="0 0 16 16" fill="none"><path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+    <div id="members-list"></div>
+  </aside>
+</div>
+
+<!-- ═══════════════════════════════════════════ MODALS ════════ -->
+
+<!-- Browse / Create Room -->
+<div id="modal-rooms" class="modal-overlay hidden">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Rooms</h3>
+      <button class="icon-btn modal-close" data-modal="modal-rooms">✕</button>
+    </div>
+    <div class="modal-tabs">
+      <button class="modal-tab active" data-tab="browse">Browse</button>
+      <button class="modal-tab" data-tab="create">Create New</button>
+    </div>
+    <div id="rooms-browse-tab">
+      <input type="text" id="room-search" class="input-field search-field" placeholder="Search rooms…">
+      <div id="room-cards" class="room-cards"></div>
+    </div>
+    <div id="rooms-create-tab" class="hidden">
+      <form id="create-room-form">
+        <div class="form-group">
+          <label>Room Name</label>
+          <input type="text" id="room-name" class="input-field" required maxlength="50" placeholder="awesome-room">
+        </div>
+        <div class="form-group">
+          <label>Description<span class="label-optional"> (optional)</span></label>
+          <input type="text" id="room-description" class="input-field" maxlength="200" placeholder="What's this room about?">
+        </div>
+        <div class="form-group">
+          <label>Visibility</label>
+          <select id="room-visibility" class="input-field">
+            <option value="public">Public — anyone can join</option>
+            <option value="private">Private — invite only</option>
+          </select>
+        </div>
+        <div class="form-error" id="create-room-error"></div>
+        <button type="submit" class="btn btn-primary btn-full">Create Room</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Room Settings -->
+<div id="modal-room-settings" class="modal-overlay hidden">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="room-settings-title">Room Settings</h3>
+      <button class="icon-btn modal-close" data-modal="modal-room-settings">✕</button>
+    </div>
+    <div class="modal-tabs">
+      <button class="modal-tab active" data-tab="edit">General</button>
+      <button class="modal-tab" data-tab="admins">Admins</button>
+      <button class="modal-tab" data-tab="bans">Bans</button>
+    </div>
+    <div id="room-edit-tab">
+      <form id="edit-room-form">
+        <div class="form-group">
+          <label>Room Name</label>
+          <input type="text" id="edit-room-name" class="input-field" maxlength="50">
+        </div>
+        <div class="form-group">
+          <label>Description</label>
+          <input type="text" id="edit-room-description" class="input-field" maxlength="200">
+        </div>
+        <div class="form-error" id="edit-room-error"></div>
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary">Save Changes</button>
+          <button type="button" class="btn btn-danger" id="btn-delete-room">Delete Room</button>
+        </div>
+      </form>
+    </div>
+    <div id="room-admins-tab" class="hidden">
+      <div class="admins-section">
+        <h4>Current Admins</h4>
+        <div id="admins-list"></div>
+      </div>
+      <div class="admins-section">
+        <h4>Promote Member to Admin</h4>
+        <div id="add-admin-members" class="add-admin-list"></div>
+      </div>
+    </div>
+    <div id="room-bans-tab" class="hidden">
+      <div id="bans-list"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Invite to Room -->
+<div id="modal-invite" class="modal-overlay hidden">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Invite to Room</h3>
+      <button class="icon-btn modal-close" data-modal="modal-invite">✕</button>
+    </div>
+    <div class="form-group">
+      <label>Search by username</label>
+      <input type="text" id="invite-search" class="input-field" placeholder="username…" autocomplete="off">
+    </div>
+    <div id="invite-results" class="user-search-results"></div>
+  </div>
+</div>
+
+<!-- Add Contact -->
+<div id="modal-add-contact" class="modal-overlay hidden">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Add Friend</h3>
+      <button class="icon-btn modal-close" data-modal="modal-add-contact">✕</button>
+    </div>
+    <form id="add-contact-form">
+      <div class="form-group">
+        <label>Username</label>
+        <input type="text" id="contact-username" class="input-field" required placeholder="their_username">
+      </div>
+      <div class="form-group">
+        <label>Message <span class="label-optional">(optional)</span></label>
+        <input type="text" id="contact-message" class="input-field" maxlength="200" placeholder="Hi! Let's be friends.">
+      </div>
+      <div class="form-error" id="add-contact-error"></div>
+      <button type="submit" class="btn btn-primary btn-full">Send Friend Request</button>
+    </form>
+  </div>
+</div>
+
+<!-- Pending Requests -->
+<div id="modal-requests" class="modal-overlay hidden">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Friend Requests</h3>
+      <button class="icon-btn modal-close" data-modal="modal-requests">✕</button>
+    </div>
+    <div id="requests-list"></div>
+  </div>
+</div>
+
+<!-- User Profile -->
+<div id="modal-user-profile" class="modal-overlay hidden">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Profile</h3>
+      <button class="icon-btn modal-close" data-modal="modal-user-profile">✕</button>
+    </div>
+    <div class="profile-card">
+      <div class="avatar avatar-xl" id="profile-avatar-lg"></div>
+      <div class="profile-name" id="profile-username-display"></div>
+      <div class="profile-status-badge" id="profile-status-badge"></div>
+      <div class="profile-actions" id="profile-action-buttons"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Settings -->
+<div id="modal-settings" class="modal-overlay hidden">
+  <div class="modal modal-wide">
+    <div class="modal-header">
+      <h3>Settings</h3>
+      <button class="icon-btn modal-close" data-modal="modal-settings">✕</button>
+    </div>
+    <div class="settings-body">
+      <section class="settings-section">
+        <h4>Change Password</h4>
+        <form id="change-password-form">
+          <div class="form-group">
+            <label>Current Password</label>
+            <input type="password" id="current-password" class="input-field" placeholder="••••••••">
+          </div>
+          <div class="form-group">
+            <label>New Password</label>
+            <input type="password" id="new-password" class="input-field" placeholder="••••••••" minlength="6">
+          </div>
+          <div class="form-error" id="change-password-error"></div>
+          <div class="form-success" id="change-password-success"></div>
+          <button type="submit" class="btn btn-primary">Update Password</button>
+        </form>
+      </section>
+
+      <section class="settings-section">
+        <h4>Active Sessions</h4>
+        <div id="sessions-list" class="sessions-list"></div>
+        <button class="btn btn-ghost btn-sm" id="btn-refresh-sessions">Refresh</button>
+      </section>
+
+      <section class="settings-section danger-zone">
+        <h4>Danger Zone</h4>
+        <div class="danger-actions">
+          <button class="btn btn-outline-danger" id="btn-logout">Sign Out</button>
+          <button class="btn btn-danger" id="btn-delete-account">Delete Account</button>
+        </div>
+      </section>
+    </div>
+  </div>
+</div>
+
+<!-- Delete Account -->
+<div id="modal-delete-account" class="modal-overlay hidden">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Delete Account</h3>
+      <button class="icon-btn modal-close" data-modal="modal-delete-account">✕</button>
+    </div>
+    <p class="warning-text">⚠ This is irreversible. All your data will be permanently deleted.</p>
+    <form id="delete-account-form">
+      <div class="form-group">
+        <label>Enter your password to confirm</label>
+        <input type="password" id="delete-account-password" class="input-field" placeholder="••••••••">
+      </div>
+      <div class="form-error" id="delete-account-error"></div>
+      <button type="submit" class="btn btn-danger btn-full">Permanently Delete My Account</button>
+    </form>
+  </div>
+</div>
+
+<!-- Edit Message -->
+<div id="modal-edit-message" class="modal-overlay hidden">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Edit Message</h3>
+      <button class="icon-btn modal-close" data-modal="modal-edit-message">✕</button>
+    </div>
+    <form id="edit-message-form">
+      <div class="form-group">
+        <textarea id="edit-message-content" class="input-field textarea-field" rows="4" maxlength="3072"></textarea>
+      </div>
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary">Save</button>
+        <button type="button" class="btn btn-ghost modal-close" data-modal="modal-edit-message">Cancel</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Context Menu -->
+<div id="context-menu" class="context-menu hidden"></div>
+
+<!-- Toast Container -->
+<div id="toast-container" class="toast-container"></div>
+
+<script src="/socket.io/socket.io.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

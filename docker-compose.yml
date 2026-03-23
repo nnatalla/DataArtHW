@@ -1,0 +1,40 @@
+services:
+  app:
+    build: .
+    container_name: classicchat-app
+    environment:
+      DB_PATH: /app/data/classicchat.db
+      NODE_ENV: production
+      JWT_SECRET: ${JWT_SECRET}
+      UPLOAD_DIR: /app/uploads
+      MAX_FILE_SIZE: 20971520
+      MAX_IMAGE_SIZE: 3145728
+      PORT: 3000
+    volumes:
+      - app_data:/app/data
+      - uploads:/app/uploads
+    ports:
+      - "127.0.0.1:3000:3000"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 512M
+        reservations:
+          memory: 128M
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+volumes:
+  app_data:
+  uploads:
