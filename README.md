@@ -15,8 +15,9 @@ A classic web-based chat application with rooms, personal messaging, file sharin
 ## Technology Stack
 
 - **Backend**: Node.js + Express + Socket.io
-- **Database**: PostgreSQL
-- **Frontend**: Vanilla HTML/CSS/JS
+- **Language**: TypeScript (compiled to JavaScript)
+- **Database**: SQLite (better-sqlite3)
+- **Frontend**: Vanilla HTML/CSS/JS (TypeScript compiled)
 - **Container**: Docker + Docker Compose
 
 ## Quick Start
@@ -24,7 +25,8 @@ A classic web-based chat application with rooms, personal messaging, file sharin
 ### Prerequisites
 
 - Docker and Docker Compose installed
-- Port 3000 and 5432 available
+- Node.js >=20.0.0 (for local development)
+- Port 3000 available
 
 ### Run with Docker Compose
 
@@ -41,21 +43,40 @@ The application will be available at http://localhost:3000
 npm install
 ```
 
-2. Set up PostgreSQL database
-
-3. Run the server:
+2. Build the project (TypeScript compilation):
 ```bash
-node server.js
+npm run build
+```
+
+3. Set up environment variables (see below)
+
+4. Run the server:
+```bash
+npm start
+```
+
+### Development Mode
+
+To run in development with auto-reload:
+```bash
+npm run dev
+```
+
+### Run Tests
+
+```bash
+npm test
 ```
 
 ## Environment Variables
 
-- `DATABASE_URL`: PostgreSQL connection string
+- `DB_PATH`: Path to SQLite database file (default: ./data/classicchat.db)
 - `PORT`: Server port (default: 3000)
 - `JWT_SECRET`: JWT signing secret
-- `UPLOAD_DIR`: Upload directory path
-- `MAX_FILE_SIZE`: Max file size in bytes (default: 20MB)
-- `MAX_IMAGE_SIZE`: Max image size in bytes (default: 3MB)
+- `UPLOAD_DIR`: Upload directory path (default: ./uploads)
+- `MAX_FILE_SIZE`: Max file size in bytes (default: 20971520 = 20MB)
+- `MAX_IMAGE_SIZE`: Max image size in bytes (default: 3145728 = 3MB)
+- `NODE_ENV`: Environment (production/development)
 
 ## API Endpoints
 
@@ -112,6 +133,42 @@ node server.js
 - `message_edited` - Message edited
 - `message_deleted` - Message deleted
 - `presence_update` - User presence changed
+
+## Project Structure
+
+```
+/
+├── server.ts          # Main server (TypeScript)
+├── db.ts              # Database layer (TypeScript)
+├── package.json       # Dependencies and scripts
+├── tsconfig.json      # TypeScript config for backend
+├── tsconfig.frontend.json  # TypeScript config for frontend
+├── docker-compose.yml # Docker orchestration
+├── Dockerfile         # Container definition
+├── public/            # Frontend static files
+│   ├── index.html     # Main HTML
+│   ├── app.js         # Compiled frontend JS
+│   ├── app.ts         # Frontend source (TypeScript)
+│   └── styles.css     # CSS styles
+├── dist/              # Compiled backend JavaScript
+└── tests/             # Test files
+```
+
+## Additional Docker Configuration
+
+### Health Check
+
+The container includes a health check at `GET /health` that monitors service availability.
+
+### Resource Limits
+
+- CPU: 1.0 core limit
+- Memory: 512MB limit, 128MB reservation
+
+### Volumes
+
+- `app_data`: SQLite database persistence
+- `uploads`: User-uploaded files persistence
 
 ## License
 

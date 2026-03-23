@@ -8,7 +8,8 @@
 
 ## 2. Technology Stack
 - **Backend**: Node.js + Express + Socket.io
-- **Database**: PostgreSQL
+- **Language**: TypeScript
+- **Database**: SQLite (better-sqlite3)
 - **Frontend**: Vanilla HTML/CSS/JS (classic web chat style)
 - **Container**: Docker + Docker Compose
 - **File Storage**: Local file system
